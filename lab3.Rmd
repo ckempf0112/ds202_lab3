@@ -1,0 +1,59 @@
+---
+title: "Lab 3"
+author: "Colin Kempf"
+date: "10/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages('readxl')
+dat <- readxl::read_xls('GSS.xls')
+```
+
+```{r}
+library(classdata)
+library(ggplot2)
+library(dplyr)
+#View(dat)
+```
+
+```{r}
+dat %>% 
+  group_by(`Marital status`) %>% 
+  summarize(school = mean(as.numeric(`Highest year of school completed`), na.rm=TRUE))
+```
+From this we can easily look at all of the means for the number of years of school completed based on marital status. The connections here seem low, as Divorced parents have a higher mean of years completed than the Separated category, and are very similar to the Never married category. The no answer has the highest mean but it is hard to glean any data off of what that would entail based on marital status. 
+
+```{r}
+q2data <- filter(dat, `Marital status` == 'No answer' & `Highest year of school completed` > 15.5 | `Marital status` == 'Never married' & `Highest year of school completed` > 13.4 | `Marital status` == 'Divorced' & `Highest year of school completed` > 13.1 | `Marital status` == 'Married' & `Highest year of school completed` > 13.0 | `Marital status` == 'separated' & `Highest year of school completed` > 11.9 | `Marital status` == 'widowed' & `Highest year of school completed` > 11.2)
+q2data
+```
+
+
+```{r}
+data3 <- dat %>% group_by(`Marital status`) %>% filter(`General happiness` %in% c('Very happy', 'Pretty happy', 'Not too happy')) %>% mutate(PeoplesHappiness = (`General happiness` %in% c('Very happy', 'Pretty happy'))) %>% select(`General happiness`, PeoplesHappiness)
+data3
+ggplot(data = data3, aes(x = PeoplesHappiness, fill = `Marital status`)) + geom_bar()
+```
+In order to look at peoples happiness I separated people into if they were happy or not. By assigning these variables I was able to compare them to each category of marital status. Based on the count of the two categories of happiness that I divided the overall happiness into, I then divided it up into section based on the martial status. The first and largest things I noticed were that overall, more people are happy than not, and that more married people are happy than the rest of the marital categories. There is also a much smaller proportional growth between unhappy and happy for separated people, than for married people, and helps to show that the separated people generally tend to be on the sadder end of the marital status spectrum. 
+
+```{r}
+data3 <- dat %>% group_by(`Marital status`) %>% filter(`General happiness` %in% c('Very happy', 'Pretty happy', 'Not too happy')) %>% mutate(PeoplesHappiness = (`General happiness` %in% c('Very happy', 'Pretty happy'))) %>% select(`General happiness`, PeoplesHappiness, `Political party affiliation`) 
+data3
+ggplot(data = data3, aes(x = PeoplesHappiness, fill = `Political party affiliation`)) + geom_bar()
+ggplot(data = data3, aes(x = `Marital status`, fill = `Political party affiliation`)) + geom_bar()
+```
+Similar to the previous question, this looks for the same but in addition looks at how the political party affiliation affects the person. By looking at these two graphs we can see the different ratios that each political party has across the martial status, as well as looking at people's happiness directly compared to the political party affiliation. Overall the correlation doesn't seem extremely strong as to if there is any impact on a persons happiness based on their political party. The ratio between the different charts seems overall very similar. 
+
+```{r}
+data4 <- dat %>% group_by(`Respondents sex`) %>% filter(`Political party affiliation` %in% c('Ind,near dem', 'Not str democrat', 'Independent', 'Strong democrat', 'Not str republican', 'Ind,near rep', 'Strong republican')) %>% mutate(Blue = (`Political party affiliation` %in% c('Ind,near dem', 'Strong democrat'))) %>% select(`Political party affiliation`, Blue)
+data4
+ggplot(data = data4, aes(x = Blue, fill = `Political party affiliation`)) + geom_bar()
+ggplot(data = data4, aes(x = Blue, fill = `Respondents sex`)) + geom_bar()
+```
+
+I decided for my last question to compare how political party was effected by sex. To do this, I narrowed my search to specifically  the more democratic end of the spectrum, which I called blue. By looking at the data I found that there are far more people who are strong democrat than strong republican. In addition,the number of female democrats was higher than the number of males. In contrast, the people that were divided up into the other groups of independant and republican were more evenly split upon male and female.
